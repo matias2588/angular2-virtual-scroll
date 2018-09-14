@@ -25,6 +25,7 @@ export declare class VirtualScrollComponent implements OnInit, OnChanges, OnDest
     contentElementRef: ElementRef;
     shimElementRef: ElementRef;
     containerElementRef: ElementRef;
+    headerElementRef: ElementRef;
     previousStart: number;
     previousEnd: number;
     startupLoop: boolean;
@@ -45,6 +46,7 @@ export declare class VirtualScrollComponent implements OnInit, OnChanges, OnDest
     private removeParentEventHandlers();
     private countItemsPerRow();
     private getElementsOffset();
+    headHeight: any;
     private calculateDimensions();
     private calculateItems();
 }

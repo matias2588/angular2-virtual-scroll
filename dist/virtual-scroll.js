@@ -148,6 +148,8 @@ var VirtualScrollComponent = (function () {
         if (this.childWidth == undefined || this.childHeight == undefined) {
             var content = this.contentElementRef.nativeElement;
             if (this.containerElementRef && this.containerElementRef.nativeElement) {
+                if (this.headHeight == undefined && this.headerElementRef)
+                    this.headHeight = this.headerElementRef.nativeElement.clientHeight;
                 content = this.containerElementRef.nativeElement;
             }
             contentDimensions = content.children[0] ? content.children[0].getBoundingClientRect() : {
@@ -164,7 +166,7 @@ var VirtualScrollComponent = (function () {
             ? (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0)
             : el.scrollTop;
         var scrollTop = Math.max(0, elScrollTop);
-        var scrollHeight = childHeight * itemCount / itemsPerRow;
+        var scrollHeight = childHeight * itemCount / itemsPerRow + (this.headHeight ? this.headHeight : 0);
         if (itemsPerCol === 1 && Math.floor(scrollTop / scrollHeight * itemCount) + itemsPerRowByCalc >= itemCount) {
             itemsPerRow = itemsPerRowByCalc;
         }
@@ -213,6 +215,8 @@ var VirtualScrollComponent = (function () {
             this.renderer.setStyle(this.contentElementRef.nativeElement, 'webkitTransform', "translateY(" + topPadding + "px)");
             this.lastTopPadding = topPadding;
         }
+        if (this.headerElementRef)
+            this.renderer.setStyle(this.headerElementRef.nativeElement, 'transform', "translateY(" + (el.scrollTop - topPadding) + "px)");
         start = !isNaN(start) ? start : -1;
         end = !isNaN(end) ? end : -1;
         start -= this.bufferAmount;
@@ -280,6 +284,7 @@ var VirtualScrollComponent = (function () {
         'contentElementRef': [{ type: core_1.ViewChild, args: ['content', { read: core_1.ElementRef },] },],
         'shimElementRef': [{ type: core_1.ViewChild, args: ['shim', { read: core_1.ElementRef },] },],
         'containerElementRef': [{ type: core_1.ContentChild, args: ['container',] },],
+        'headerElementRef': [{ type: core_1.ContentChild, args: ['header',] },],
     };
     return VirtualScrollComponent;
 }());

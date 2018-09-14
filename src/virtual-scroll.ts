@@ -117,6 +117,9 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
   @ContentChild('container')
   containerElementRef: ElementRef;
 
+  @ContentChild('header')
+  headerElementRef: ElementRef;
+
   previousStart: number;
   previousEnd: number;
   startupLoop: boolean = true;
@@ -244,6 +247,7 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     return offsetTop;
   }
 
+  headHeight;
   private calculateDimensions() {
     let el: Element = this.parentScroll instanceof Window ? document.body : this.parentScroll || this.element.nativeElement;
     let items = this.items || [];
@@ -255,6 +259,8 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     if (this.childWidth == undefined || this.childHeight == undefined) {
       let content = this.contentElementRef.nativeElement;
       if (this.containerElementRef && this.containerElementRef.nativeElement) {
+        if(this.headHeight == undefined && this.headerElementRef)
+          this.headHeight = this.headerElementRef.nativeElement.clientHeight;
         content = this.containerElementRef.nativeElement;
       }
       contentDimensions = content.children[0] ? content.children[0].getBoundingClientRect() : {
@@ -272,7 +278,7 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
       ? (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0)
       : el.scrollTop;
     let scrollTop = Math.max(0, elScrollTop);
-    const scrollHeight = childHeight * itemCount / itemsPerRow;
+    const scrollHeight = childHeight * itemCount / itemsPerRow + (this.headHeight ? this.headHeight : 0);
     if (itemsPerCol === 1 && Math.floor(scrollTop / scrollHeight * itemCount) + itemsPerRowByCalc >= itemCount) {
       itemsPerRow = itemsPerRowByCalc;
     }
@@ -329,6 +335,9 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
       this.renderer.setStyle(this.contentElementRef.nativeElement, 'webkitTransform', `translateY(${topPadding}px)`);
       this.lastTopPadding = topPadding;
     }
+
+    if(this.headerElementRef)
+      this.renderer.setStyle(this.headerElementRef.nativeElement, 'transform', `translateY(${el.scrollTop-topPadding}px)`);    
 
     start = !isNaN(start) ? start : -1;
     end = !isNaN(end) ? end : -1;
